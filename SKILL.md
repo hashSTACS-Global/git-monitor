@@ -2,7 +2,6 @@
 name: git-monitor
 description: 分析 GitHub 仓库的 commit 历史，统计代码贡献、检查提交规范、用 LLM 分析代码功能。当用户要求分析某个 GitHub 仓库的 commit、代码贡献或提交规范时使用。
 argument-hint: 请分析 <repo_url> 最近一周的提交
-allowed-tools: Bash(python *), Read, Glob, Grep
 context: fork
 ---
 

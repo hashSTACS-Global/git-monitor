@@ -55,6 +55,52 @@ else
     green "安装完成！"
 fi
 
+# ── 配置 Claude Code 权限 ──
+CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+
+# 需要的权限列表
+PERMISSIONS=(
+    "Bash(python3 *)"
+    "Bash(python *)"
+)
+
+if [ -f "$CLAUDE_SETTINGS" ]; then
+    python3 -c "
+import json, sys
+
+with open('$CLAUDE_SETTINGS', 'r') as f:
+    settings = json.load(f)
+
+allow = settings.setdefault('permissions', {}).setdefault('allow', [])
+added = []
+for perm in sys.argv[1:]:
+    if perm not in allow:
+        allow.append(perm)
+        added.append(perm)
+
+if added:
+    with open('$CLAUDE_SETTINGS', 'w') as f:
+        json.dump(settings, f, indent=2, ensure_ascii=False)
+        f.write('\n')
+    for p in added:
+        print(f'  + {p}')
+else:
+    print('  (权限已存在，无需修改)')
+" "${PERMISSIONS[@]}"
+else
+    # settings.json 不存在，创建一个
+    python3 -c "
+import json, sys
+settings = {'permissions': {'allow': list(sys.argv[1:])}}
+with open('$CLAUDE_SETTINGS', 'w') as f:
+    json.dump(settings, f, indent=2, ensure_ascii=False)
+    f.write('\n')
+for p in sys.argv[1:]:
+    print(f'  + {p}')
+" "${PERMISSIONS[@]}"
+fi
+green "Claude Code 权限已配置"
+
 # ── 验证安装 ──
 if [ ! -f "$SKILL_DIR/SKILL.md" ]; then
     red "错误：安装后未找到 SKILL.md，安装可能不完整"
