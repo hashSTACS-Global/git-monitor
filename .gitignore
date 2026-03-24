@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+output/diffs/
+output/manifest.json
+output/rules_content.md
+.claude/
