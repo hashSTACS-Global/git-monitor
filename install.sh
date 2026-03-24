@@ -13,23 +13,90 @@ green()  { printf '\033[32m%s\033[0m\n' "$*"; }
 yellow() { printf '\033[33m%s\033[0m\n' "$*"; }
 red()    { printf '\033[31m%s\033[0m\n' "$*"; }
 
-# ── 前置检查 ──
+# ── 自动安装依赖 ──
+
+# 检测包管理器
+detect_pkg_manager() {
+    if [[ "$(uname)" == "Darwin" ]]; then
+        if command -v brew &>/dev/null; then
+            echo "brew"
+        else
+            echo "none_mac"
+        fi
+    elif command -v apt-get &>/dev/null; then
+        echo "apt"
+    elif command -v dnf &>/dev/null; then
+        echo "dnf"
+    elif command -v yum &>/dev/null; then
+        echo "yum"
+    elif command -v pacman &>/dev/null; then
+        echo "pacman"
+    else
+        echo "none"
+    fi
+}
+
+install_package() {
+    local pkg="$1"
+    local mgr
+    mgr=$(detect_pkg_manager)
+
+    yellow "正在尝试自动安装 $pkg..."
+    case "$mgr" in
+        brew)    brew install "$pkg" ;;
+        apt)     sudo apt-get update -qq && sudo apt-get install -y "$pkg" ;;
+        dnf)     sudo dnf install -y "$pkg" ;;
+        yum)     sudo yum install -y "$pkg" ;;
+        pacman)  sudo pacman -S --noconfirm "$pkg" ;;
+        none_mac)
+            red "未找到 Homebrew，请先安装 Homebrew："
+            red '  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+            red "然后重新运行本安装脚本。"
+            exit 1
+            ;;
+        *)
+            red "无法自动安装 $pkg：未识别的包管理器"
+            red "请手动安装后重新运行本脚本。"
+            exit 1
+            ;;
+    esac
+}
+
+# 检查 git
 if ! command -v git &>/dev/null; then
-    red "错误：未找到 git，请先安装 git"
-    exit 1
+    install_package git
+    if ! command -v git &>/dev/null; then
+        red "错误：git 安装失败，请手动安装"
+        exit 1
+    fi
+    green "git 安装成功"
 fi
 
+# 检查 python3
 if ! command -v python3 &>/dev/null; then
-    red "错误：未找到 python3，请先安装 Python 3.10+"
-    exit 1
+    install_package python3
+    if ! command -v python3 &>/dev/null; then
+        red "错误：python3 安装失败，请手动安装"
+        exit 1
+    fi
+    green "python3 安装成功"
 fi
 
+# 检查 python3 版本
 python_version=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
 python_major=$(echo "$python_version" | cut -d. -f1)
 python_minor=$(echo "$python_version" | cut -d. -f2)
 if [ "$python_major" -lt 3 ] || { [ "$python_major" -eq 3 ] && [ "$python_minor" -lt 10 ]; }; then
-    red "错误：需要 Python 3.10+，当前版本为 $python_version"
-    exit 1
+    yellow "当前 Python 版本为 $python_version，需要 3.10+"
+    if [[ "$(uname)" == "Darwin" ]] && command -v brew &>/dev/null; then
+        yellow "正在通过 Homebrew 升级 Python..."
+        brew install python@3.12 || brew upgrade python@3.12
+        python_version=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+        green "Python 已升级至 $python_version"
+    else
+        red "错误：需要 Python 3.10+，请手动升级"
+        exit 1
+    fi
 fi
 
 # ── 确保 skills 目录存在 ──
