@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Git Monitor — Claude Code Skill 安装脚本
-# 用法：curl -sL https://raw.githubusercontent.com/xxx/git-monitor/main/install.sh | bash
+# 用法：curl -sL https://raw.githubusercontent.com/hashSTACS-Global/git-monitor/main/install.sh | bash
 set -euo pipefail
 
 SKILL_NAME="git-monitor"

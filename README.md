@@ -13,7 +13,7 @@
 在 Claude Code 中运行：
 
 ```bash
-curl -sL https://raw.githubusercontent.com/xxx/git-monitor/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/hashSTACS-Global/git-monitor/main/install.sh | bash
 ```
 
 安装完成后，重启 Claude Code 会话即可使用 `/git-monitor` 命令。
@@ -96,7 +96,7 @@ git-monitor/
 重新运行安装命令即可更新到最新版本：
 
 ```bash
-curl -sL https://raw.githubusercontent.com/xxx/git-monitor/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/hashSTACS-Global/git-monitor/main/install.sh | bash
 ```
 
 或手动更新：
@@ -122,7 +122,7 @@ rm -rf ~/.claude/skills/git-monitor
 
 1. 运行安装脚本：
    ```bash
-   curl -sL https://raw.githubusercontent.com/xxx/git-monitor/main/install.sh | bash
+   curl -sL https://raw.githubusercontent.com/hashSTACS-Global/git-monitor/main/install.sh | bash
    ```
 
 2. 验证安装成功：
